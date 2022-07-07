@@ -1,4 +1,4 @@
-import { FormControl, MenuItem, Select, Table, Card,CardContent } from '@material-ui/core';
+import { FormControl, MenuItem, Select, Table, Card, CardContent } from '@material-ui/core';
 import './App.css';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
@@ -7,6 +7,7 @@ import Map from './Map';
 function App() {
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState('worldwide');
+  const [countryInfo, setCountryInfo] = useState({});
   useEffect(() => {
     // The code inside here will run once 
     // when the component loads and not again
@@ -22,6 +23,7 @@ function App() {
             }
           ));
           setCountries(countries);
+     
         });
     };
     getCountriesData();// handling asynchronous peace of data
@@ -32,9 +34,22 @@ function App() {
   const onCountryChange = async (event) => {
     const countryCode = event.target.value;
 
-    console.log('Yoooooo >>>>', countryCode);
-    setCountry(countryCode);
-  }
+   setCountry(countryCode);
+
+    const url = countryCode === "worldwide" ? "https://disease.sh/v3/covid-19/all" :
+      `https://disease.sh/v3/covid-19/countries/${countryCode}`;
+
+    await fetch(url).then((response) => response.json()).then((data) =>
+     {
+      setCountry(countryCode);
+
+      // All of the data...
+      // from the country response 
+      setCountryInfo(data);
+    });
+  };
+
+  console.log("COUNTRY INFO >>>", countryInfo);
 
   return (
     <div className="app">
@@ -57,9 +72,9 @@ function App() {
         {/*Header */}
         {/*Title + Select input dropdown field */}
         <div className='app__stats'>
-          <InfoBox title='Coronavirus Cases' cases={123} total={2000} />
-          <InfoBox title='Recovered' cases={1234} total={3000} />
-          <InfoBox title="Deaths" cases={12345} total={4000} />
+          <InfoBox title='Coronavirus Cases' cases={countryInfo.todayCases} total={countryInfo.cases} />
+          <InfoBox title='Recovered' cases={countryInfo.todayRecovered} total={countryInfo.recovered} />
+          <InfoBox title="Deaths" cases={countryInfo.todayDeaths} total={countryInfo.deaths} />
           {/* InfoBoxs */}
 
           {/* InfoBoxs */}
