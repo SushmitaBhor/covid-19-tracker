@@ -1,4 +1,4 @@
-import { FormControl, MenuItem, Select, Table, Card, CardContent } from '@material-ui/core';
+import { FormControl, MenuItem, Select, Card, CardContent } from '@material-ui/core';
 import './App.css';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
@@ -8,6 +8,14 @@ function App() {
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState('worldwide');
   const [countryInfo, setCountryInfo] = useState({});
+
+  useEffect(() => {
+    fetch("https://disease.sh/v3/covid-19/all").
+    then((response) => response.json()).then((data) => {
+      setCountryInfo(data);
+    })
+  }, [])
+
   useEffect(() => {
     // The code inside here will run once 
     // when the component loads and not again
@@ -23,7 +31,7 @@ function App() {
             }
           ));
           setCountries(countries);
-     
+
         });
     };
     getCountriesData();// handling asynchronous peace of data
@@ -34,13 +42,12 @@ function App() {
   const onCountryChange = async (event) => {
     const countryCode = event.target.value;
 
-   setCountry(countryCode);
+    setCountry(countryCode);
 
     const url = countryCode === "worldwide" ? "https://disease.sh/v3/covid-19/all" :
       `https://disease.sh/v3/covid-19/countries/${countryCode}`;
 
-    await fetch(url).then((response) => response.json()).then((data) =>
-     {
+    await fetch(url).then((response) => response.json()).then((data) => {
       setCountry(countryCode);
 
       // All of the data...
